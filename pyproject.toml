@@ -1,18 +1,15 @@
 [tool.poetry]
-name = "INFS4203"
+name = "infs4203"
 version = "0.1.0"
 description = ""
 authors = ["Lars Moan <lars.ostberg.moan@gmail.com>"]
 readme = "README.md"
-packages = [{include = "infs4203"}]
 
 [tool.poetry.dependencies]
-python = ">=3.11,<3.13"
-python-dotenv = "^1.0.0"
+python = "^3.11"
 torch = "^2.0.1"
 pandas = "^2.1.0"
-matplotlib = "^3.8.0"
-numpy = "^1.26.0"
+python-dotenv = "^1.0.0"
 
 
 [build-system]

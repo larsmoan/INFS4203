@@ -12,3 +12,8 @@ def get_data_dir():
         return Exception("No data directory found in the .env file or missing a .env file in the repo's root")
     p = Path(path)
     return p
+
+
+
+if __name__ == "__main__":
+    print("Repo data directory: ", get_data_dir())
