@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "infs4203-proj"
+name = "INFS4203"
 version = "0.1.0"
 description = ""
 authors = ["Lars Moan <lars.ostberg.moan@gmail.com>"]
 readme = "README.md"
-packages = [{include = "infs4203_proj"}]
+packages = [{include = "infs4203"}]
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.13"
