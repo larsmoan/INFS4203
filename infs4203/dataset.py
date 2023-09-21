@@ -4,7 +4,6 @@ import pandas as pd
 class INFS4203Dataset():
     def __init__(self, csv_file, transforms=None):
         self.df = pd.read_csv(get_data_dir() / csv_file)
-
         if transforms:
             for transform in transforms:
                 self.df = transform(self.df)
@@ -41,5 +40,4 @@ def impute_values(df):
 
 
 dset = INFS4203Dataset("train.csv", [impute_values])
-
-
+print(dset.df.head())
