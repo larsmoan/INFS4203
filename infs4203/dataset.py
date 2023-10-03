@@ -14,6 +14,7 @@ class INFS4203Dataset():
 
         self.cat_cols = self.df.columns[100:128]
         self.numerical_columns = self.df.columns[:100]
+        self.feature_columns = self.df.columns[:128]
         self.labels = ["airplane", "car", "bird", "cat", "deer", "dog", "frog", "horse", "ship", "truck"]
         self.W_values_dict = {}  # Initializing the dictionary to store W values
 
@@ -44,9 +45,9 @@ class INFS4203Dataset():
             plt.legend(prop={'size': 8})  # Adjust the font size here
             plt.show()
 
-    def scatter_plot(self, col_1, col_2):
+    def scatter_plot(self, col_1, col_2, df):
         #Plots the two colums against eachother for all the classes.
-        sns.scatterplot(x=col_1, y=col_2, hue='Label', data=self.df, legend='full', hue_norm=(0,10), palette='Set1').set_title('Visualize')
+        sns.scatterplot(x=col_1, y=col_2, hue='Label', data=df, legend='full', hue_norm=(0,10), palette='Set1').set_title('Visualize')
         plt.legend(prop={'size': 8})
         plt.show()
         
@@ -150,7 +151,8 @@ class INFS4203Dataset():
         return df_tmp
 
     def normalize(self) -> pd.DataFrame:
-        columns_to_normalize = self.numerical_columns
+        columns_to_normalize = self.feature_columns
+
         scaler = MinMaxScaler()
 
         df_normalized = self.cleaned_df.copy()
