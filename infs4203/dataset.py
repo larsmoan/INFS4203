@@ -12,25 +12,16 @@ class INFS4203Dataset():
     def __init__(self, csv_file, preprocessing=True):
         self.df = pd.read_csv(get_data_dir() / csv_file)
 
-        #Class members
         self.cat_cols = self.df.columns[100:128]
         self.numerical_columns = self.df.columns[:100]
-
         self.labels = ["airplane", "car", "bird", "cat", "deer", "dog", "frog", "horse", "ship", "truck"]
-
-        if len(self.df) < 10:
-            print("Couldnt load df")
-
-        if preprocessing:
-            self.df = self.impute_values()
-            self.cleaned_df = self.anomaly_detection(n_std_dev=4)
-            self.normalized_df = self.normalize()
-        
-        
-        
         self.W_values_dict = {}  # Initializing the dictionary to store W values
 
-
+        if preprocessing:
+            self.df = self.impute_values()  #Imputes the NaN's
+            self.cleaned_df = self.anomaly_detection(n_std_dev=4)   #Removes the outliers
+            self.normalized_df = self.normalize()   #Normalizes the cleaned_df
+        
     def __getitem__(self, idx):
         #Return a sample from the dataframe with corresponding label
         data = self.df.iloc[idx]
@@ -53,17 +44,15 @@ class INFS4203Dataset():
             plt.legend(prop={'size': 8})  # Adjust the font size here
             plt.show()
 
-    def visualize(self, col_1, col_2):
+    def scatter_plot(self, col_1, col_2):
         #Plots the two colums against eachother for all the classes.
         sns.scatterplot(x=col_1, y=col_2, hue='Label', data=self.df, legend='full', hue_norm=(0,10), palette='Set1').set_title('Visualize')
         plt.legend(prop={'size': 8})
         plt.show()
         
     def plot_distribution(self, column_name, df, block):
-        
         subframes = [df[df['Label'] == i] for i in range(0,10)]
         num_cols = 5
-
         num_rows = len(subframes) // num_cols + (len(subframes) % num_cols > 0)
         fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, 4*num_rows))
         
@@ -78,8 +67,8 @@ class INFS4203Dataset():
             row_idx = i // num_cols
             col_idx = i % num_cols
             fig.delaxes(axes[row_idx, col_idx])
-        plt.tight_layout()
 
+        plt.tight_layout()
         plt.show(block=block)
 
     def shapiro_wilk(self):
@@ -116,7 +105,6 @@ class INFS4203Dataset():
     def anomaly_detection(self, n_std_dev=3) -> pd.DataFrame:
         # Segment the dataframe based on unique values in the 'Label' column
         subframes = [self.df[self.df['Label'] == i] for i in range(0,10)]
-
         cleaned_subframes = []  # List to store subframes after removing outliers
 
         for i, subframe in enumerate(subframes):
@@ -149,8 +137,6 @@ class INFS4203Dataset():
 
         resulting_subframes = []
         for subframe in subframes:
-      
-
             cat_mode = subframe[self.cat_cols].mode().iloc[0]    #Most common value used to impute the cateogrical columns
             num_mean = subframe[self.numerical_columns].mean()            #Mean for the numerical columns
             subframe = subframe.fillna(num_mean)
@@ -163,29 +149,14 @@ class INFS4203Dataset():
         
         return df_tmp
 
-
-
-
-    #V1: I think this just brute forces the normalization. Need to do some outlier detection before this can be applied properly.
     def normalize(self) -> pd.DataFrame:
         columns_to_normalize = self.numerical_columns
         scaler = MinMaxScaler()
 
-        #Make a new normalized dataframe and return it
         df_normalized = self.cleaned_df.copy()
         df_normalized[columns_to_normalize] = scaler.fit_transform(df_normalized[columns_to_normalize])
-
         return df_normalized
 
-        
-
-
+    
 if __name__ == "__main__":
     dset = INFS4203Dataset('train.csv', preprocessing=True)
-    print(dset.numerical_columns)
-
-
-    dset.plot_distribution('Cat_Col_103', dset.normalized_df, block=False)
-    dset.plot_distribution('Cat_Col_103', dset.df, block=True)
-    
-
