@@ -11,13 +11,9 @@ TODO:
   
 ---
 
-# My Python Project
-
-This is a brief description of your Python project. Explain what the project does, who it's for, and why you created it.
+# INFS4203 Data Mining project
 
 ## Prerequisites
-
-- **Python**: This project requires Python 3.7+ (or the version you used).
 - **Poetry**: This project uses Poetry for dependency management.
 
 ## Getting Started
