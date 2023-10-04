@@ -9,10 +9,6 @@ TODO:
 - [ ] Creating decision tree classifier with k-fold CV.
 - [ ] Creating random forest classifier with k-fold CV.
   
-
-
-  Of course, here's a simplified and concise `README.md` focusing on the basics of downloading and using Poetry for your project:
-
 ---
 
 # My Python Project
@@ -66,15 +62,5 @@ This is a brief description of your Python project. Explain what the project doe
 2. **Run the main script or application**:
 
    ```bash
-   python your_script.py
+   python main.py
    ```
-
-Replace `your_script.py` with the main script or entry point of your application.
-
-## License
-
-Your project's license (e.g., MIT, GPL, etc.)
-
----
-
-Remember to replace placeholders (e.g., `yourusername`, `yourprojectname`, `your_script.py`) with the relevant details for your project.
