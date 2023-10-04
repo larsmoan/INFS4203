@@ -31,19 +31,20 @@ class INFS4203Dataset():
         return features, label
 
     #Does the dimensionality reduction of the dataset from 129 components -> 2 and saves them as their own columns
-    def addTSNE(self, plot_result=False):
-        if not 'x_tsne' in self.df.columns:
-            df_numeric = self.df.drop(self.non_numerical_cols, axis=1)
+    def plotTSNE(self, df, plot_result=True, block=True):
+        df_tmp = df.copy()
+        df_numeric = df_tmp[self.feature_columns]
 
-            m = TSNE(learning_rate=50)
-            tsne_feattures = m.fit_transform(df_numeric)
-            self.df['x_tsne'] = tsne_feattures[:, 0]
-            self.df['y_tsne'] = tsne_feattures[:, 1]
+        m = TSNE(learning_rate=50)
+        tsne_features = m.fit_transform(df_numeric)
+        df_tmp['x_tsne'] = tsne_features[:, 0]
+        df_tmp['y_tsne'] = tsne_features[:, 1]
 
         if plot_result:
-            sns.scatterplot(x='x_tsne', y='y_tsne', hue='Label', data=self.df, legend='full', hue_norm=(0,10), palette='Set1').set_title("Dimensionality reduction TSNE")
+            plt.figure()
+            sns.scatterplot(x='x_tsne', y='y_tsne', hue='Label', data=df_tmp, legend='full', hue_norm=(0,10), palette='Set1').set_title("Dimensionality reduction TSNE")
             plt.legend(prop={'size': 8})  # Adjust the font size here
-            plt.show()
+            plt.show(block=block)
 
     def scatter_plot(self, col_1, col_2, df):
         #Plots the two colums against eachother for all the classes.
