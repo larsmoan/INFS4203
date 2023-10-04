@@ -9,7 +9,8 @@ from typing import List, Dict, Any, Tuple, Optional
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from collections import Counter
-
+from utils import get_data_dir, standardize_test_data
+import pandas as pd
 
 class KNNClassifier:
     def __init__(self, hyperparams: Dict[str, List[Any]]):
@@ -98,12 +99,17 @@ if __name__ == '__main__':
     kmeans.fit(X, y)
     print("KMeans score: ", kmeans.score(X, y))
 
-    #Testing the algorithms on completely unseen data
 
-    testset = INFS4203Dataset("train2.csv", preprocessing=True)
-    test_data = testset.std_normalized_df
-    X_test = test_data[testset.feature_columns].values
-    y_test = test_data.Label.values
+
+
+    # ----------------- Testing the algorithms on completely unseen data --------------
+    testset = INFS4203Dataset("train2.csv", preprocessing=True).df
+
+    testset_standardized = standardize_test_data(testset, dataset.column_means, dataset.column_stds)
+
+    # Assuming the last column is the label
+    X_test = testset_standardized.iloc[:, :-1].values
+    y_test = testset.iloc[:, -1].values
 
     print("KNN score: ", knn.score(X_test, y_test))
     print("KMeans score: ", kmeans.score(X_test, y_test))

@@ -22,17 +22,9 @@ if __name__ == "__main__":
     print("Repo data directory: ", get_data_dir())
 
 
-def print_terminal_histogram(y_test):
-    # Get counts for each label, ensuring labels 0-9 are used
-    counts = (
-        pd.Series(y_test).value_counts(normalize=True).reindex(range(10), fill_value=0)
-    )
+def standardize_test_data(test_df, column_means, column_stds):
+    standardized_df = test_df.copy()
+    for col in column_means.keys():
+        standardized_df[col] = (test_df[col] - column_means[col]) / column_stds[col]
+    return standardized_df
 
-    # Maximum length of the bar
-    max_length = 40
-
-    for index, value in counts.items():
-        bar_length = int(value * max_length)
-        bar = "■" * bar_length
-        # Align bars to the right for consistent visualization
-        print(f"{index}: {bar.rjust(max_length)} {value:.2f}")

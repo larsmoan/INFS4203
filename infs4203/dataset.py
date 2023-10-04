@@ -30,6 +30,10 @@ class INFS4203Dataset:
         ]
         self.W_values_dict = {}  # Initializing the dictionary to store W values
 
+        self.std_scaler = StandardScaler()  # move this to the class level
+        self.column_means = {}  # to store means of columns
+        self.column_stds = {}  # to store standard deviations of columns
+
         if preprocessing:
             self.df = self.impute_values()  # Imputes the NaN's
             self.cleaned_df, self.anomaly_records = self.anomaly_detection(
@@ -192,7 +196,6 @@ class INFS4203Dataset:
     def normalize(self) -> pd.DataFrame:
         columns_to_normalize = self.feature_columns
         min_max_scaler = MinMaxScaler()
-        std_scaler = StandardScaler()
 
         df_std_normalized = self.cleaned_df.copy()
         df_min_max_normalized = self.cleaned_df.copy()
@@ -201,11 +204,19 @@ class INFS4203Dataset:
             df_min_max_normalized[columns_to_normalize]
         )
 
-        df_std_normalized[columns_to_normalize] = std_scaler.fit_transform(
+        df_std_normalized[columns_to_normalize] = self.std_scaler.fit_transform(
             df_std_normalized[columns_to_normalize]
         )
 
+        # Save means and stds for each column
+        for col in columns_to_normalize:
+            self.column_means[col] = self.std_scaler.mean_[list(columns_to_normalize).index(col)]
+            self.column_stds[col] = np.sqrt(self.std_scaler.var_)[list(columns_to_normalize).index(col)]
+
+
         return df_std_normalized, df_min_max_normalized
+
+
 
 
 if __name__ == "__main__":
