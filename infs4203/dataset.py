@@ -30,15 +30,14 @@ class INFS4203Dataset:
         ]
         self.W_values_dict = {}  # Initializing the dictionary to store W values
 
-        self.std_scaler = StandardScaler()  # move this to the class level
+        self.std_scaler = StandardScaler() 
         self.column_means = {}  # to store means of columns
         self.column_stds = {}  # to store standard deviations of columns
 
         if preprocessing:
             self.df = self.impute_values()  # Imputes the NaN's
             self.cleaned_df, self.anomaly_records = self.anomaly_detection(
-                n_std_dev=4
-            )  # Removes the outliers
+                n_std_dev=4)  # Removes the outliers
             (
                 self.min_max_normalized_df,
                 self.std_normalized_df,
@@ -135,7 +134,6 @@ class INFS4203Dataset:
         # Segment the dataframe based on unique values in the 'Label' column
         subframes = [self.df[self.df["Label"] == i] for i in range(0, 10)]
         cleaned_subframes = []  # List to store subframes after removing outliers
-
         anomalies_records = []  # List to store details about anomalies
 
         for i, subframe in enumerate(subframes):

@@ -11,73 +11,39 @@ from sklearn.tree import DecisionTreeClassifier
 from collections import Counter
 from utils import get_data_dir, standardize_test_data
 import pandas as pd
+from collections import Counter
+from sklearn.tree import plot_tree
+import matplotlib.pyplot as plt
 
-class KNNClassifier:
-    def __init__(self, hyperparams: Dict[str, List[Any]]):
-        self.knn = KNeighborsClassifier()
-        self.hyperparams = hyperparams
+from models import KNNClassifier, KMeansClassifier, DecisionTreeClassifier
 
-    def fit(self, X, y):
-        grid_search = GridSearchCV(
-            self.knn,
-            self.hyperparams,
-            cv=10,
-            verbose=1,
-            scoring="f1_macro",
-            n_jobs=-1,
-        )
-        grid_search.fit(X, y)
-        self.knn = grid_search.best_estimator_
 
-        print("KNN best params: ", grid_search.best_params_)
-        print("KNN best score: ", grid_search.best_score_)
+def majority_voting(models: List, X: List):
+    num_entries = len(X)
+    predictions = []
+
+    # Preallocate an array for predictions
+    all_preds = np.zeros((num_entries, len(models)))
+
+    for i in range(len(models)):
+        all_preds[:, i] = models[i].predict(X)
+
+    for i in range(num_entries):
+        counter = Counter(all_preds[i])
+        most_common_value = counter.most_common(1)[0][0]
+        predictions.append(most_common_value)
     
-    def score(self, X, y):
-        predicted_labels = self.knn.predict(X)
-        return f1_score(y, predicted_labels, average="macro")
+    return predictions
 
-class KMeansClassifier:
-    def __init__(self, hyperparams: Dict[str, List[Any]]):
-        self.kmeans = KMeans(n_init=1)
-        self.hyperparams = hyperparams
-        self.cluster_to_label_mapping = None
 
-    def fit(self, X, y):
-        # Perform the grid search
-        grid_search = GridSearchCV(
-            self.kmeans,
-            self.hyperparams,
-            cv=10,
-            verbose=1,
-            n_jobs=-1
-        )
-        grid_search.fit(X)
-        print("KMeans best params: ", grid_search.best_params_)
-        self.kmeans = grid_search.best_estimator_
-        cluster_assignments = self.kmeans.labels_
-        
-        # Create a mapping from cluster ID to most frequent y value
-        self.cluster_to_label_mapping = {}
-        for cluster_id in set(cluster_assignments):
-            true_labels_in_cluster = [y[i] for i, label in enumerate(cluster_assignments) if label == cluster_id]
-            most_common_label = Counter(true_labels_in_cluster).most_common(1)[0][0]
-            self.cluster_to_label_mapping[cluster_id] = most_common_label
-
-    def predict(self, X):
-        clusters = self.kmeans.predict(X)
-        return [self.cluster_to_label_mapping[cluster] for cluster in clusters]
-
-    def score(self, X, y):
-        predicted_labels = self.predict(X)
-        return f1_score(y, predicted_labels, average="macro")
 
 
 if __name__ == '__main__':
     # ---------- Load the dataset --------------------
-    dataset = INFS4203Dataset("train.csv", preprocessing=True)
-    data = dataset.std_normalized_df
-
-    X = data[dataset.feature_columns].values
+    train_data = INFS4203Dataset("train.csv", preprocessing=True)
+    data = train_data.std_normalized_df
+    X = data[train_data.feature_columns].values
+    X_not_norm = train_data.cleaned_df[train_data.feature_columns].values   #Removed outliers but not normalized
     y = data.Label.values
 
     hyperparams_knn = {
@@ -90,22 +56,23 @@ if __name__ == '__main__':
         "n_clusters": [3, 5, 7, 9, 11, 12, 13, 14, 15, 16, 17, 18],
     }
 
+    #Run GridSearch CV on hyperparams, and fit the estimators to the train data.
     # ---------- KNN --------------------
     knn = KNNClassifier(hyperparams_knn)
     knn.fit(X, y)
-
+ 
     # ---------- KMeans --------------------
     kmeans = KMeansClassifier(hyperparams_kmeans)
     kmeans.fit(X, y)
-    print("KMeans score: ", kmeans.score(X, y))
 
-
-
+    dtree = DecisionTreeClassifier()
+    dtree.fit(X_not_norm, y)
 
     # ----------------- Testing the algorithms on completely unseen data --------------
-    testset = INFS4203Dataset("train2.csv", preprocessing=True).df
-
-    testset_standardized = standardize_test_data(testset, dataset.column_means, dataset.column_stds)
+    testset = INFS4203Dataset("train2.csv", preprocessing=True).df  #This will utilize the same class by imputing the NaN's present in the other train set
+                                                                    # for the actual test set imputation will not be done. Just the standardization as done below.
+    testset_standardized = standardize_test_data(testset, train_data.column_means, train_data.column_stds)
+    
 
     # Assuming the last column is the label
     X_test = testset_standardized.iloc[:, :-1].values
@@ -113,3 +80,12 @@ if __name__ == '__main__':
 
     print("KNN score: ", knn.score(X_test, y_test))
     print("KMeans score: ", kmeans.score(X_test, y_test))
+    print("DTree score: ", dtree.score(X_test, y_test))
+
+    # ----------------- Majority voting --------------
+    models = [knn, kmeans, dtree]
+    maj_predictions = majority_voting(models, X_test)
+    print("Majority voting score: ", f1_score(y_test, maj_predictions, average="macro"))
+
+    plot_tree(dtree.decision_tree, max_depth=3)
+    plt.show()
