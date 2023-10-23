@@ -7,6 +7,7 @@ from sklearn.cluster import KMeans
 from collections import Counter
 from sklearn.tree import DecisionTreeClassifier as SklearnDecisionTreeClassifier
 from sklearn.tree import plot_tree
+from sklearn.metrics import classification_report
 
 
 
@@ -33,6 +34,8 @@ class KNNClassifier:
     
     def score(self, X, y):
         predicted_labels = self.predict(X)
+        report = classification_report(y, predicted_labels)
+        print("Classification report for: KNN classifier \n", report)
         return f1_score(y, predicted_labels, average="macro")
     
     def predict(self, X):
@@ -71,6 +74,8 @@ class KMeansClassifier:
 
     def score(self, X, y):
         predicted_labels = self.predict(X)
+        report = classification_report(y, predicted_labels)
+        print("Classification report for: KMeans classifier \n", report)
         return f1_score(y, predicted_labels, average="macro")
     
 class DecisionTreeClassifier:
@@ -87,5 +92,7 @@ class DecisionTreeClassifier:
         return self.decision_tree.predict(X)
     
     def score(self, X, y):
-        predictions = self.predict(X)
-        return f1_score(y, predictions, average="macro")
+        predicted_labels = self.predict(X)
+        report = classification_report(y, predicted_labels)
+        print("Classification report for: DecisionTree classifier \n", report)
+        return f1_score(y, predicted_labels, average="macro")
