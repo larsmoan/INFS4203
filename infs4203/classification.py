@@ -13,8 +13,15 @@ from models import (
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import f1_score
 from sklearn.tree import DecisionTreeClassifier, plot_tree
-from utils import get_data_dir, standardize_test_data
+from utils import get_data_dir
 import os
+
+def standardize_test_data(test_df, column_means, column_stds):
+    standardized_df = test_df.copy()
+    for col in column_means.keys():
+        standardized_df[col] = (test_df[col] - column_means[col]) / column_stds[col]
+    return standardized_df
+
 
 def majority_voting(models: List, not_std_models: List, X: np.ndarray, X_not_std: np.ndarray):
     num_entries = len(X)
@@ -27,8 +34,6 @@ def majority_voting(models: List, not_std_models: List, X: np.ndarray, X_not_std
     for j in range(len(models), len(models) + len(not_std_models)):
         all_preds[:, j] = not_std_models[j-len(models)].predict(X_not_std)
 
-
-    
 
     for i in range(num_entries):
         counter = Counter(all_preds[i])
@@ -53,7 +58,7 @@ def outputFormatter(pred, acc, f1, filename):
     pred_int = [int(x) for x in pred]
     csv_string = ",\n".join(map(str, pred_int))
     csv_string += ",\n" + acc + "," + f1
-    filename = filename if filename.endswith(".csv") else filename + ".csv"
+    #filename = filename if filename.endswith(".csv") else filename + ".csv"
     with open(filename, "w") as f:
         f.write(csv_string)
     return csv_string
@@ -112,27 +117,33 @@ if __name__ == "__main__":
 
     
     # ----------------- Testing the algorithms on completely unseen data --------------
-    testset = INFS4203Dataset(
+    validationset = INFS4203Dataset(
         "train2.csv", preprocessing=True
     ).df  # This will utilize the same class by imputing the NaN's present in the other train set
     # for the actual test set imputation will not be done. Just the standardization as done below.
-    testset_standardized = standardize_test_data(
-        testset, train_data.column_means, train_data.column_stds
+    validationset_standardized = standardize_test_data(
+        validationset, train_data.column_means, train_data.column_stds
     )
 
     # Assuming the last column is the label
-    X_test = testset_standardized.iloc[:, :-1].values
-    X_test_not_std = testset.iloc[:, :-1].values
-    y_test = testset.iloc[:, -1].values
+    X_val = validationset_standardized.iloc[:, :-1].values
+    X_val_not_std = validationset.iloc[:, :-1].values
+    y_val = validationset.iloc[:, -1].values
 
-    print("KNN score: ", knn.score(X_test, y_test))
-    print("KMeans score: ", kmeans.score(X_test, y_test))
-    print("Random Forest score: ", rf.score(X_test_not_std, y_test))
+    print("KNN score: ", knn.score(X_val, y_val))
+    print("KMeans score: ", kmeans.score(X_val, y_val))
+    print("Random Forest score: ", rf.score(X_val_not_std, y_val))
 
 
-    # ----------------- Majority voting --------------
-    models = [knn, kmeans]
-    not_std_models = [rf, rf, rf]
-    predictions = majority_voting(models, not_std_models, X_test, X_test_not_std)
+    #Using the random forest algorithm to predict the labels for the test set
+    testset = pd.read_csv(get_data_dir() / "test.csv")
+    testset_standardized = standardize_test_data(testset, train_data.column_means, train_data.column_stds)
+    testset_not_std = testset.iloc[:, :].values
 
-    print("Majority voting score: ", f1_score(y_test, predictions, average="macro"))
+    y_pred = rf.predict(testset_not_std)
+    
+    #Generate report
+    acc = rf.model.score(X_val_not_std, y_val)
+    f1 = f1_score(y_val, rf.predict(X_val_not_std), average="macro")
+
+    outputFormatter(y_pred, acc, f1, get_data_dir() / "s4827064.csv")

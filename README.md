@@ -57,6 +57,10 @@ Based on inspecting the class specific distributions it seems that the class 'ca
 
 ![Shapiro-Wilkes](./data/shapiro_wilkes.png)
 
+Another interesting finding was how tSNE was able to reduce the dimensionality reduction -> 2D so well. 
+![tSNE](./data/tSNE_result.png)
+
+
 # Model results
 From the initial training I tested out k-NN, k-means, decision tree and random forest. Quite quickly it seemed that using grid search cross-validation I was able to get an f1-macro of 1 using all models except for the Decision Tree.
 

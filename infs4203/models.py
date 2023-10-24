@@ -119,6 +119,7 @@ class RandomForestCLassifier:
                 self.model.score(X, y),
                 "was achieved",
             )
+    
 
     def score(self, X, y):
         predicted_labels = self.model.predict(X)
