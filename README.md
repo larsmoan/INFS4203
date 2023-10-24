@@ -86,7 +86,7 @@ RandomForest classifier
 | **Macro Avg** | 0.94      | 0.95   | **0.94**     | 1880    |
 | **Weighted Avg** | 0.95   | 0.95   | 0.95     | 1880    |
 
-Random Forest score:  ***0.9446733091529772***
+
 
 
 
@@ -104,11 +104,10 @@ KMeans classifier
 | 8.0   | 0.81      | 0.69   | 0.74     | 159     |
 | 9.0   | 0.67      | 0.96   | 0.79     | 144     |
 |       |           |        |          |         |
-| **Accuracy** |            |        | 0.79     | 1880    |
+| **Accuracy** |            |        | ***0.79***     | 1880    |
 | **Macro Avg** | 0.78      | 0.78   | 0.78     | 1880    |
 | **Weighted Avg** | 0.80   | 0.79   | 0.79     | 1880    |
 
-KMeans score:  ***0.7773243278648437***
 
 KNN classifier 
    | Class | Precision | Recall | F1-Score | Support |
@@ -124,10 +123,8 @@ KNN classifier
 | 8.0   | 0.89      | 0.58   | 0.70     | 159     |
 | 9.0   | 0.79      | 0.96   | 0.87     | 144     |
 |       |           |        |          |         |
-| **Accuracy** |            |        | 0.68     | 1880    |
+| **Accuracy** |            |        | ***0.68***     | 1880    |
 | **Macro Avg** | 0.75      | 0.67   | 0.68     | 1880    |
 | **Weighted Avg** | 0.77   | 0.68   | 0.70     | 1880    |
 
-
-KNN score:  ***0.6832852759129342***
 
