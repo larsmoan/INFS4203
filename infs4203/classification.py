@@ -1,11 +1,7 @@
 from dataset import INFS4203Dataset
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import f1_score
-from sklearn.cluster import KMeans
 import numpy as np
-from sklearn.model_selection import GridSearchCV
-from typing import List, Dict, Any, Tuple, Optional
+from typing import List
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from collections import Counter

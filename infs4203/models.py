@@ -10,27 +10,29 @@ from sklearn.tree import plot_tree
 from sklearn.metrics import classification_report
 
 
-
 class KNNClassifier:
-    def __init__(self, hyperparams: Dict[str, List[Any]]):
-        self.knn = KNeighborsClassifier()
-        self.hyperparams = hyperparams
+    def __init__(self):
+        self.knn = KNeighborsClassifier(n_neighbors=3)
 
-    def fit(self, X, y):
-        grid_search = GridSearchCV(
-            self.knn,
-            self.hyperparams,
-            cv=10,
-            verbose=1,
-            scoring="f1_macro",
-            n_jobs=-1,
-        )
-        grid_search.fit(X, y)
-        self.knn = grid_search.best_estimator_
+    def fit(self, X, y, hyperparams: Optional[Dict[str, List[Any]]] = None):
+        if hyperparams:
+            self.hyperparams = hyperparams
+            grid_search = GridSearchCV(
+                self.knn,
+                self.hyperparams,
+                cv=10,
+                verbose=1,
+                scoring="f1_macro",
+                n_jobs=-1,
+            )
+            grid_search.fit(X, y)
+            self.knn = grid_search.best_estimator_
 
-        print("KNN best params: ", grid_search.best_params_)
-        print("KNN best score: ", grid_search.best_score_)
-    
+            print("KNN best params: ", grid_search.best_params_)
+            print("KNN best score: ", grid_search.best_score_)
+        else:
+            self.knn.fit(X, y)
+            print("Fitted KNN with default hyperparams: a score of: ", self.knn.score(X, y), "was achieved")
     
     def score(self, X, y):
         predicted_labels = self.predict(X)
