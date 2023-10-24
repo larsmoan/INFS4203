@@ -1,12 +1,11 @@
-from utils import get_data_dir
-import pandas as pd
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
-from scipy import stats
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
-from sklearn.manifold import TSNE
 from scipy import stats
+from sklearn.manifold import TSNE
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from utils import get_data_dir
 
 
 class INFS4203Dataset:
@@ -30,14 +29,15 @@ class INFS4203Dataset:
         ]
         self.W_values_dict = {}  # Initializing the dictionary to store W values
 
-        self.std_scaler = StandardScaler() 
+        self.std_scaler = StandardScaler()
         self.column_means = {}  # to store means of columns
         self.column_stds = {}  # to store standard deviations of columns
 
         if preprocessing:
             self.df = self.impute_values()  # Imputes the NaN's
             self.cleaned_df, self.anomaly_records = self.anomaly_detection(
-                n_std_dev=4)  # Removes the outliers
+                n_std_dev=4
+            )  # Removes the outliers
             (
                 self.min_max_normalized_df,
                 self.std_normalized_df,
@@ -61,9 +61,11 @@ class INFS4203Dataset:
         df_tmp["y_tsne"] = tsne_features[:, 1]
 
         if plot_result:
-            self.scatter_plot("x_tsne", "y_tsne", df_tmp)
+            self.scatter_plot(
+                "x_tsne", "y_tsne", df_tmp, "tSNE dimensionality reduction -> 2D"
+            )
 
-    def scatter_plot(self, col_1, col_2, df):
+    def scatter_plot(self, col_1, col_2, df, title):
         # Plots the two colums against eachother for all the classes.
         plt.figure()
         sns.scatterplot(
@@ -74,7 +76,7 @@ class INFS4203Dataset:
             legend="full",
             hue_norm=(0, 10),
             palette="Set1",
-        ).set_title("Visualize")
+        ).set_title(title)
         plt.legend(prop={"size": 8})
         plt.show()
 
@@ -208,13 +210,14 @@ class INFS4203Dataset:
 
         # Save means and stds for each column
         for col in columns_to_normalize:
-            self.column_means[col] = self.std_scaler.mean_[list(columns_to_normalize).index(col)]
-            self.column_stds[col] = np.sqrt(self.std_scaler.var_)[list(columns_to_normalize).index(col)]
-
+            self.column_means[col] = self.std_scaler.mean_[
+                list(columns_to_normalize).index(col)
+            ]
+            self.column_stds[col] = np.sqrt(self.std_scaler.var_)[
+                list(columns_to_normalize).index(col)
+            ]
 
         return df_std_normalized, df_min_max_normalized
-
-
 
 
 if __name__ == "__main__":

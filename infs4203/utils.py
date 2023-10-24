@@ -1,7 +1,8 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv
+
 import pandas as pd
+from dotenv import load_dotenv
 
 
 # Note: you need a .env file in the root of your repository with REPO_DATA_DIR: "path" for this method to work
@@ -27,4 +28,3 @@ def standardize_test_data(test_df, column_means, column_stds):
     for col in column_means.keys():
         standardized_df[col] = (test_df[col] - column_means[col]) / column_stds[col]
     return standardized_df
-
