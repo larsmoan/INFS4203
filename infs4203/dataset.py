@@ -43,14 +43,7 @@ class INFS4203Dataset:
                 self.std_normalized_df,
             ) = self.normalize()  # Normalizes the cleaned_df
 
-    def __getitem__(self, idx):
-        # Return a sample from the dataframe with corresponding label
-        data = self.df.iloc[idx]
-        features = data[:128].values.astype("float32")
-        label = data[128:].values.astype("int32")
-        return features, label
-
-    # Does the dimensionality reduction of the dataset from 129 components -> 2 and saves them as their own columns
+    # Does the dimensionality reduction of the dataset from 129 components -> 2 and saves them as their own columns. Also plots them as default
     def plotTSNE(self, df, plot_result=True, block=True):
         df_tmp = df.copy()
         df_numeric = df_tmp[self.feature_columns]
@@ -65,8 +58,8 @@ class INFS4203Dataset:
                 "x_tsne", "y_tsne", df_tmp, "tSNE dimensionality reduction -> 2D"
             )
 
+    #Plots the relation between col_1 and col_2 in a specified version of the dataframe. Does this for all classes
     def scatter_plot(self, col_1, col_2, df, title):
-        # Plots the two colums against eachother for all the classes.
         plt.figure()
         sns.scatterplot(
             x=col_1,
@@ -80,8 +73,13 @@ class INFS4203Dataset:
         plt.legend(prop={"size": 8})
         plt.show()
 
+    #Plots the distribution of a specific column on a class basis
     def plot_distribution(self, column_name, df, block):
-        subframes = [df[df["Label"] == i] for i in range(0, 10)]
+        last_column = self.df.iloc[:, -1]
+        unique_labels = last_column.unique()   
+        assert len(unique_labels) == 10 
+        subframes = [self.df[last_column == elem] for elem in unique_labels]
+
         num_cols = 5
         num_rows = len(subframes) // num_cols + (len(subframes) % num_cols > 0)
         fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, 4 * num_rows))
@@ -104,7 +102,11 @@ class INFS4203Dataset:
         plt.show(block=block)
 
     def shapiro_wilk(self):
-        subframes = [self.df[self.df["Label"] == i] for i in range(0, 10)]
+        last_column = self.df.iloc[:, -1]
+        unique_labels = last_column.unique()   
+        assert len(unique_labels) == 10 
+        subframes = [self.df[last_column == elem] for elem in unique_labels]
+
         num_columns = len(self.df.columns) - 1  # Excluding 'Label' column
 
         # Create a figure and axes for 2x5 subplots
@@ -134,7 +136,11 @@ class INFS4203Dataset:
 
     def anomaly_detection(self, n_std_dev=3) -> pd.DataFrame:
         # Segment the dataframe based on unique values in the 'Label' column
-        subframes = [self.df[self.df["Label"] == i] for i in range(0, 10)]
+        last_column = self.df.iloc[:, -1]
+        unique_labels = last_column.unique()   
+        assert len(unique_labels) == 10 
+        subframes = [self.df[last_column == elem] for elem in unique_labels]
+
         cleaned_subframes = []  # List to store subframes after removing outliers
         anomalies_records = []  # List to store details about anomalies
 
@@ -172,8 +178,12 @@ class INFS4203Dataset:
 
     # Used to impute both numerical and categorical values for NaN values present in the original dataset
     def impute_values(self) -> pd.DataFrame:
-        unique_label = self.df["Label"].unique()
-        subframes = [self.df[self.df["Label"] == elem] for elem in unique_label]
+        #Get the last column from the dataframE
+        last_column = self.df.iloc[:, -1]
+        unique_labels = last_column.unique()   
+        assert len(unique_labels) == 10 
+        subframes = [self.df[last_column == elem] for elem in unique_labels]
+    
 
         resulting_subframes = []
         for subframe in subframes:
@@ -219,6 +229,27 @@ class INFS4203Dataset:
 
         return df_std_normalized, df_min_max_normalized
 
-
 if __name__ == "__main__":
-    dset = INFS4203Dataset("train.csv", preprocessing=True)
+    #Code for adding the two datasets train and train2 .csv together and splitting 
+    # them using a stratified teqhnique into train_strat.csv and val_strat.csv
+    #Merge two csv files into one
+    from sklearn.model_selection import train_test_split
+
+    df1 = pd.read_csv(get_data_dir() / 'train.csv')
+    df2 = pd.read_csv(get_data_dir() / 'train2.csv')
+    df = pd.concat([df1, df2], ignore_index=True)
+    df = df.reset_index(drop=True)
+
+    # Define the features and labels
+    X = df.iloc[:, :-1]  # Features (all columns except the last)
+    y = df.iloc[:, -1]   # Labels (last column)
+
+    # Use stratified split to create training and testing sets
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.15, stratify=y, random_state=42)
+
+    #New df's
+    train_df = pd.concat([X_train, y_train], axis=1)
+    val_df = pd.concat([X_val, y_val], axis=1)
+    #Saving them
+    train_df.to_csv(get_data_dir() / "train_strat.csv", index=False)
+    val_df.to_csv(get_data_dir() / "val_strat.csv", index=False)

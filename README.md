@@ -1,6 +1,5 @@
 ## INFS4203 Data Mining project @ UQ
 
-
 TODO:
 - [x] Data preprocessing   
 - [ ] Making another way of detecting anomalies for the class 'car'. Given that it doesn't follow a normal distribution. 
@@ -50,82 +49,129 @@ TODO:
    ```bash
    python classification.py
    ```
+3. **Reproduce the hyperparameter search:**:
+   ```bash
+   python hyperparameter_tuning.py
+   ```
+
+## Dataset
+The data used in this project can be found in the data/ folder. It is anynomized, but said to come from CIFAR-10 but with a lot of preprocessing from the teaching staff, such as removing values and adding outliers.
+
+Each sample consist of a *128-dimensional* feature vector, each having a label from 0-9.
+
+| Label Number | Actual Label |
+|--------------|--------------|
+| 0            | airplane     |
+| 1            | car          |
+| 2            | bird         |
+| 3            | cat          |
+| 4            | deer         |
+| 5            | dog          |
+| 6            | frog         |
+| 7            | horse        |
+| 8            | ship         |
+| 9            | truck        |
+
+### Original dataset: train.csv
+This dataset consists of 2180 entries 
+
+### Secondary dataset: train2.csv
+This dataset was released from the teaching staff midway in the project and conists of 1880 entries of the same size as the original dataset.
+However from inspecting both of them it seems that the second dataset has a lot more inherent complexity present.
+This can be seen when reducing the dimensionality of the dataset from 128 -> 2 using tSNE (not part of the curriculum).
 
 
-## Results and findings
-Based on inspecting the class specific distributions it seems that the class 'car' is not normally distributed. This poses a problem since the outlier detection is done by assuming a Gaussian distribution of the data. 
+<figure style="margin-right: 10px; display: inline-block;">
+   <img src="./data/tSNE_primary.png" alt="Example Image" width="460" height="340">
+   <figcaption>tSNE on the original dataset</figcaption>
+</figure>
 
-![Shapiro-Wilkes](./data/shapiro_wilkes.png)
+<figure style="margin-right: 10px; display: inline-block;">
+   <img src="./data/tSNE_secondary.png" alt="Example Image" width="460" height="340">
+   <figcaption>tSNE on the secondary dataset</figcaption>
+</figure>
 
-Another interesting finding was how tSNE was able to reduce the dimensionality reduction -> 2D so well. 
-![tSNE](./data/tSNE_result.png)
+<figure style="display: inline-block;">
+   <img src="./data/tSNE_joint.png" alt="Example Image" width="460" height="340">
+   <figcaption>tSNE on the joint dataset of the original + secondary</figcaption>
+</figure>
+
+
+***Another finding when comparing the datasets is how closely each class specific feature follows a gaussian distribution.***
+
+<figure style="margin-right: 10px; display: inline-block;">
+  <img src="./data/sw_primary.png" alt="Example Image" width="460" height="340">
+  <figcaption>Shapiro-Wilkes test on the original dataset</figcaption>
+</figure>
+
+<figure style="margin-right: 10px; display: inline-block;">
+  <img src="./data/sw_secondary.png" alt="Example Image" width="460" height="340">
+  <figcaption>Shapiro-Wilkes test on the secondary dataset</figcaption>
+</figure>
+
+<figure style="display: inline-block;">
+  <img src="./data/sw_joint.png" alt="Example Image" width="460" height="340">
+  <figcaption>Shapiro-Wilkes test on the joint dataset</figcaption>
+</figure>
 
 
 # Model results
 From the initial training I tested out k-NN, k-means, decision tree and random forest.
 Decision tree performed so poorly that I haven't included it in the results.
 
-### The results was obtained using the other training set: train2.csv as a completely unseen testset, but with labels.
+### The results below was obtained using the combination of train and train2 as training set whilst using 20% of this as validation data that was not seen when the models were fitted.
 
 ## Classification reports:
-RandomForest classifier 
-
-| Class | Precision | Recall | F1-Score | Support |
-|-------|-----------|--------|----------|---------|
-| 0.0   | 0.93      | 0.97   | 0.95     | 207     |
-| 1.0   | 0.98      | 0.97   | 0.98     | 204     |
-| 2.0   | 0.98      | 0.93   | 0.96     | 194     |
-| 3.0   | 0.94      | 0.91   | 0.93     | 280     |
-| 4.0   | 0.93      | 0.97   | 0.95     | 187     |
-| 5.0   | 0.79      | 0.85   | 0.82     | 99      |
-| 6.0   | 0.98      | 0.99   | 0.99     | 217     |
-| 7.0   | 0.99      | 0.99   | 0.99     | 189     |
-| 8.0   | 0.94      | 0.94   | 0.94     | 159     |
-| 9.0   | 0.96      | 0.95   | 0.95     | 144     |
-|       |           |        |          |         |
-| **Accuracy** |            |        | 0.95         |  1880   |
-| **Macro Avg** | 0.94      | 0.95   | **0.94**     | 1880    |
-| **Weighted Avg** | 0.95   | 0.95   | 0.95     | 1880    |
+| Classification report for: RandomForest classifier | precision | recall | f1-score | support |
+|---------------------------------------------------|-----------|--------|----------|---------|
+| 0.0                                               |   0.92    |  0.98  |   0.95   |    56   |
+| 1.0                                               |   0.99    |  0.99  |   0.99   |    86   |
+| 2.0                                               |   1.00    |  0.93  |   0.97   |    61   |
+| 3.0                                               |   0.97    |  0.96  |   0.97   |    81   |
+| 4.0                                               |   0.95    |  0.96  |   0.95   |    55   |
+| 5.0                                               |   0.88    |  1.00  |   0.94   |    22   |
+| 6.0                                               |   0.97    |  1.00  |   0.99   |    69   |
+| 7.0                                               |   1.00    |  0.98  |   0.99   |    65   |
+| 8.0                                               |   0.98    |  0.95  |   0.97   |    65   |
+| 9.0                                               |   0.98    |  0.94  |   0.96   |    49   |
+| accuracy                                          |           |        |   0.97   |   609   |
+| macro avg                                        |   0.96    |  0.97  |   ***0.97***   |   609   |
+| weighted avg                                     |   0.97    |  0.97  |   0.97   |   609   |
 
 
+| Classification report for: KMeans classifier | precision | recall | f1-score | support |
+|---------------------------------------------|-----------|--------|----------|---------|
+| 0.0                                         |   0.96    |  0.96  |   0.96   |    56   |
+| 1.0                                         |   0.96    |  0.78  |   0.86   |    86   |
+| 2.0                                         |   0.84    |  0.95  |   0.89   |    61   |
+| 3.0                                         |   0.93    |  0.96  |   0.95   |    81   |
+| 4.0                                         |   0.79    |  0.96  |   0.87   |    55   |
+| 5.0                                         |   0.69    |  1.00  |   0.81   |    22   |
+| 6.0                                         |   0.94    |  0.70  |   0.80   |    69   |
+| 7.0                                         |   1.00    |  0.98  |   0.99   |    65   |
+| 8.0                                         |   0.95    |  0.97  |   0.96   |    65   |
+| 9.0                                         |   0.92    |  0.94  |   0.93   |    49   |
+| accuracy                                    |           |        |   0.91   |   609   |
+| macro avg                                  |   0.90    |  0.92  |   ***0.90***   |   609   |
+| weighted avg                               |   0.92    |  0.91  |   0.91   |   609   |
+
+| Classification report for: KNN classifier | precision | recall | f1-score | support |
+|------------------------------------------|-----------|--------|----------|---------|
+| 0.0                                      |   0.97    |  1.00  |   0.98   |    56   |
+| 1.0                                      |   0.99    |  0.99  |   0.99   |    86   |
+| 2.0                                      |   1.00    |  0.93  |   0.97   |    61   |
+| 3.0                                      |   0.98    |  0.99  |   0.98   |    81   |
+| 4.0                                      |   0.95    |  0.96  |   0.95   |    55   |
+| 5.0                                      |   0.96    |  1.00  |   0.98   |    22   |
+| 6.0                                      |   0.99    |  1.00  |   0.99   |    69   |
+| 7.0                                      |   1.00    |  0.98  |   0.99   |    65   |
+| 8.0                                      |   0.98    |  0.97  |   0.98   |    65   |
+| 9.0                                      |   0.96    |  0.96  |   0.96   |    49   |
+| accuracy                                 |           |        |   0.98   |   609   |
+| macro avg                               |   0.98    |  0.98  |   ***0.98***   |   609   |
+| weighted avg                            |   0.98    |  0.98  |   0.98   |   609   |
 
 
 
-KMeans classifier 
-| Class | Precision | Recall | F1-Score | Support |
-|-------|-----------|--------|----------|---------|
-| 0.0   | 0.82      | 0.83   | 0.82     | 207     |
-| 1.0   | 0.81      | 0.76   | 0.78     | 204     |
-| 2.0   | 0.80      | 0.73   | 0.76     | 194     |
-| 3.0   | 0.84      | 0.80   | 0.82     | 280     |
-| 4.0   | 0.84      | 0.85   | 0.84     | 187     |
-| 5.0   | 0.47      | 0.51   | 0.49     | 99      |
-| 6.0   | 0.81      | 0.74   | 0.77     | 217     |
-| 7.0   | 0.93      | 0.98   | 0.96     | 189     |
-| 8.0   | 0.81      | 0.69   | 0.74     | 159     |
-| 9.0   | 0.67      | 0.96   | 0.79     | 144     |
-|       |           |        |          |         |
-| **Accuracy** |            |        | ***0.79***     | 1880    |
-| **Macro Avg** | 0.78      | 0.78   | 0.78     | 1880    |
-| **Weighted Avg** | 0.80   | 0.79   | 0.79     | 1880    |
 
-
-KNN classifier 
-   | Class | Precision | Recall | F1-Score | Support |
-|-------|-----------|--------|----------|---------|
-| 0.0   | 0.84      | 0.78   | 0.81     | 207     |
-| 1.0   | 0.32      | 0.84   | 0.46     | 204     |
-| 2.0   | 0.73      | 0.41   | 0.53     | 194     |
-| 3.0   | 0.91      | 0.72   | 0.81     | 280     |
-| 4.0   | 0.87      | 0.80   | 0.83     | 187     |
-| 5.0   | 0.44      | 0.31   | 0.36     | 99      |
-| 6.0   | 0.78      | 0.47   | 0.59     | 217     |
-| 7.0   | 0.94      | 0.81   | 0.87     | 189     |
-| 8.0   | 0.89      | 0.58   | 0.70     | 159     |
-| 9.0   | 0.79      | 0.96   | 0.87     | 144     |
-|       |           |        |          |         |
-| **Accuracy** |            |        | ***0.68***     | 1880    |
-| **Macro Avg** | 0.75      | 0.67   | 0.68     | 1880    |
-| **Weighted Avg** | 0.77   | 0.68   | 0.70     | 1880    |
-
-
+***During the project process I did numerous different train / val splits and RandomForest seemed to generally always perform better on completely unseen data. Especially when it was fitted on the original dataset (train.csv) and validated on the second dataset (train2.csv). Therefore RandomForest was chosen as the classifier used on the testset and generated the results for the final report.***
