@@ -89,29 +89,28 @@ This can be seen when reducing the dimensionality of the dataset from 128 -> 2 u
 </figure>
 
 <figure style="display: inline-block;">
-   <img src="./data/tSNE_joint_dset.png" alt="Example Image" width="460" height="340">
+   <img src="./data/tSNE_joint.png" alt="Example Image" width="460" height="340">
    <figcaption>tSNE on the joint dataset of the original + secondary</figcaption>
 </figure>
 
 
-Another finding when comparing the datasets is how closely each class specific feature follows a gaussian distribution.
+***Another finding when comparing the datasets is how closely each class specific feature follows a gaussian distribution.***
 
-<div style="display: flex; justify-content: space-between;">
-  <figure style="margin-right: 4px;">
-    <img src="./data/sw_primary.png" alt="Example Image" width="460" height="340">
-    <figcaption>Shapiro-Wilkes test on the original dataset</figcaption>
-  </figure>
-  
-  <figure style="margin-right: 4px;">
-    <img src="./data/sw_secondary.png" alt="Example Image" width="460" height="340">
-    <figcaption>Shapiro-Wilkes test on the secondary dataset</figcaption>
-  </figure>
-  
-  <figure>
-    <img src="./data/sw_joint.png" alt="Example Image" width="460" height="340">
-    <figcaption>Shapiro-Wilkes test on the joint dataset</figcaption>
-  </figure>
-</div>
+<figure style="margin-right: 10px; display: inline-block;">
+  <img src="./data/sw_primary.png" alt="Example Image" width="460" height="340">
+  <figcaption>Shapiro-Wilkes test on the original dataset</figcaption>
+</figure>
+
+<figure style="margin-right: 10px; display: inline-block;">
+  <img src="./data/sw_secondary.png" alt="Example Image" width="460" height="340">
+  <figcaption>Shapiro-Wilkes test on the secondary dataset</figcaption>
+</figure>
+
+<figure style="display: inline-block;">
+  <img src="./data/sw_joint.png" alt="Example Image" width="460" height="340">
+  <figcaption>Shapiro-Wilkes test on the joint dataset</figcaption>
+</figure>
+
 
 
 
