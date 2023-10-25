@@ -172,8 +172,12 @@ class INFS4203Dataset:
 
     # Used to impute both numerical and categorical values for NaN values present in the original dataset
     def impute_values(self) -> pd.DataFrame:
-        unique_label = self.df["Label"].unique()
-        subframes = [self.df[self.df["Label"] == elem] for elem in unique_label]
+        #Get the last column from the dataframE
+        last_column = self.df.iloc[:, -1]
+        unique_labels = last_column.unique()   
+        assert len(unique_labels) == 10 
+        subframes = [self.df[last_column == elem] for elem in unique_labels]
+    
 
         resulting_subframes = []
         for subframe in subframes:
@@ -219,6 +223,6 @@ class INFS4203Dataset:
 
         return df_std_normalized, df_min_max_normalized
 
-
 if __name__ == "__main__":
-    dset = INFS4203Dataset("train.csv", preprocessing=True)
+    dset = INFS4203Dataset("train_strat.csv", preprocessing=True)
+    

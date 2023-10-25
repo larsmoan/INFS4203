@@ -51,9 +51,72 @@ TODO:
    python classification.py
    ```
 
+## Dataset
+The data used in this project can be found in the data/ folder. It is anynomized, but said to come from CIFAR-10 but with a lot of preprocessing from the teaching staff, such as removing values and adding outliers.
+
+Each sample consist of a *128-dimensional* feature vector, each having a label from 0-9.
+
+| Label Number | Actual Label |
+|--------------|--------------|
+| 0            | airplane     |
+| 1            | car          |
+| 2            | bird         |
+| 3            | cat          |
+| 4            | deer         |
+| 5            | dog          |
+| 6            | frog         |
+| 7            | horse        |
+| 8            | ship         |
+| 9            | truck        |
+
+### Original datase: train.csv
+This dataset consists of 2180 entries 
+
+### Secondary dataset: train2.csv
+This dataset was released from the teaching staff midway in the project and conists of 1880 entries of the same size as the original dataset.
+However from inspecting both of them it seems that the second dataset has a lot more inherent complexity present.
+This can be seen when reducing the dimensionality of the dataset from 128 -> 2 using tSNE (not part of the curriculum.)
+
+<div style="display: flex; justify-content: space-between;">
+  <figure style="margin-right: 4px;">
+    <img src="./data/tSNE_primary.png" alt="Example Image" width="460" height="340">
+    <figcaption>tSNE on the original dataset</figcaption>
+  </figure>
+  
+  <figure style="margin-right: 4px;">
+    <img src="./data/tSNE_secondary.png" alt="Example Image" width="460" height="340">
+    <figcaption>tSNE on the secondary dataset</figcaption>
+  </figure>
+  
+  <figure>
+    <img src="./data/tSNE_joint.png" alt="Example Image" width="460" height="340">
+    <figcaption>tSNE on the joint dataset of the original + secondary</figcaption>
+  </figure>
+</div>
+
+Another finding when comparing the datasets is how closely each class specific feature follows a gaussian distribution.
+
+<div style="display: flex; justify-content: space-between;">
+  <figure style="margin-right: 4px;">
+    <img src="./data/sw_primary.png" alt="Example Image" width="460" height="340">
+    <figcaption>Shapiro-Wilkes test on the original dataset</figcaption>
+  </figure>
+  
+  <figure style="margin-right: 4px;">
+    <img src="./data/sw_secondary.png" alt="Example Image" width="460" height="340">
+    <figcaption>Shapiro-Wilkes test on the secondary dataset</figcaption>
+  </figure>
+  
+  <figure>
+    <img src="./data/sw_joint.png" alt="Example Image" width="460" height="340">
+    <figcaption>Shapiro-Wilkes test on the joint dataset</figcaption>
+  </figure>
+</div>
+
+
 
 ## Results and findings
-Based on inspecting the class specific distributions it seems that the class 'car' is not normally distributed. This poses a problem since the outlier detection is done by assuming a Gaussian distribution of the data. 
+Based on inspecting the class specific distributions it seems that the class 'car' (Label 1) is not normally distributed. This poses a problem since the outlier detection is done by assuming a Gaussian distribution of the data. 
 
 ![Shapiro-Wilkes](./data/shapiro_wilkes.png)
 

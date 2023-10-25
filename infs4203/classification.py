@@ -60,84 +60,35 @@ def outputFormatter(pred, acc, f1, filename):
     return csv_string
 
 if __name__ == "__main__":
-    # ---------- Load the dataset --------------------
-    train_data = INFS4203Dataset("train.csv", preprocessing=True)
-    #train_data.plotTSNE(train_data.df, plot_result=True, block=True)  # This is not part of the curriculum, but added to show the possibility of dimensionality reduction -> 2D.
 
-    X = train_data.std_normalized_df[train_data.feature_columns].values
-    X_not_std = train_data.cleaned_df[train_data.feature_columns].values
-
-    y = train_data.std_normalized_df.Label.values   #Labels, common for both set of X_
-
-    # ---------- Hyperparameters for the different models --------------------
-    hyperparams_knn = {
-        "n_neighbors": [3, 5, 7, 9, 11, 15, 300],
-        "weights": ["uniform", "distance"],
-        "metric": ["euclidean", "manhattan", "minkowski"],
-    }
-
-    hyperparams_kmeans = {
-        "n_clusters": [3, 5, 7, 9, 11, 12, 13, 14, 15],
-    }
-
-    hyperparams_rf = {
-        "n_estimators": np.linspace(3, 100, num=10, dtype=int),
-        "max_depth": [1, 5, 20, 100],  # Maximum number of levels in tree
-        "min_samples_split": [1, 5, 10, 30],
-        "min_samples_leaf": [1, 3, 4],
-        "criterion": ["gini", "entropy"],  # Criterion
-    }
-
-    # Run GridSearch CV on hyperparams, and fit the estimators to the train data.
-    # ---------- KNN --------------------
-    knn = KNNClassifier()
-    knn.fit(X, y, hyperparams_knn)
-
-    # ---------- KMeans --------------------
-    kmeans = KMeansClassifier()
-    kmeans.fit(X, y, hyperparams_kmeans)
-
-
-    # ---------- Random Forest --------------------
-    if os.path.isfile(get_data_dir() / "rf_best_estimator.joblib"):
-        print("Have already fitted RF algo")
-        rf = joblib.load(get_data_dir() / "rf_best_estimator.joblib")
-    else:
-        #We dont have a "fitted" random forest yet
-        rf = RandomForestCLassifier()
-        rf.fit(X_not_std, y, hyperparams_rf)  #Not using standardized data for X since this is not needed for RF
-        joblib.dump(rf, get_data_dir() / "rf_best_estimator.joblib")    #Saving the optimized rf
-
-
-    
     # ----------------- Validating the algorithms on completely unseen data --------------
-    validationset = INFS4203Dataset(
-        "train2.csv", preprocessing=True
-    ).df  # This will utilize the same class by imputing the NaN's present in the other train set
-    # for the actual test set imputation will not be done. Just the standardization as done below.
-    validationset_standardized = standardize_test_data(
-        validationset, train_data.column_means, train_data.column_stds
-    )
-
-    # Assuming the last column is the label
-    X_val = validationset_standardized.iloc[:, :-1].values
-    X_val_not_std = validationset.iloc[:, :-1].values
+    validationset = INFS4203Dataset("val_strat.csv", preprocessing=True)
+    X_val_std = validationset.std_normalized_df.iloc[:, :-1].values
+    X_val = validationset.df.iloc[:, :-1].values
     y_val = validationset.iloc[:, -1].values
 
-    print("KNN score: ", knn.score(X_val, y_val))
-    print("KMeans score: ", kmeans.score(X_val, y_val))
-    print("Random Forest score: ", rf.score(X_val_not_std, y_val))
+    #Load the models from best checkpoints
+    knn = joblib.load(get_data_dir() / "knn_best.joblib")
+    kmeans = joblib.load(get_data_dir() / "kmeans_best.joblib")
+    rf = joblib.load(get_data_dir() / "rf_best.joblib")
 
-
-    #Using the random forest algorithm to predict the labels for the test set
-    testset = pd.read_csv(get_data_dir() / "test.csv")
-    testset_standardized = standardize_test_data(testset, train_data.column_means, train_data.column_stds)
-    testset_not_std = testset.iloc[:, :].values
-
-    y_pred = rf.predict(testset_not_std)
+    #Score the models on the validation data
+    print("KNN score: ", knn.score(X_val_std, y_val))
+    print("KMeans score: ", kmeans.score(X_val_std, y_val))
+    print("Random Forest score: ", rf.score(X_val, y_val))
     
-    #Generate report
-    """ acc = rf.model.score(X_val_not_std, y_val)
-    f1 = f1_score(y_val, rf.predict(X_val_not_std), average="macro")
 
-    outputFormatter(y_pred, acc, f1, get_data_dir() / "s4827064.csv") """
+
+#Using the random forest algorithm to predict the labels for the test set
+testset = pd.read_csv(get_data_dir() / "test.csv")
+testset_standardized = standardize_test_data(testset, train_data.column_means, train_data.column_stds)
+
+testset_not_std = testset.iloc[:, :].values #This is the featurespace used for the RF-algo on the test set
+
+y_pred = rf.predict(testset_not_std)
+
+#Generate report
+acc = rf.model.score(X_val_not_std, y_val)
+f1 = f1_score(y_val, rf.predict(X_val_not_std), average="macro")
+
+outputFormatter(y_pred, acc, f1, get_data_dir() / "s4827064_strat.csv")
