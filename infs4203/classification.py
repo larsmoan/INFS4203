@@ -12,7 +12,6 @@ from models import (
 )
 from sklearn.metrics import f1_score
 from utils import get_data_dir
-import os
 
 def standardize_test_data(test_df, column_means, column_stds):
     standardized_df = test_df.copy()
@@ -20,17 +19,17 @@ def standardize_test_data(test_df, column_means, column_stds):
         standardized_df[col] = (test_df[col] - column_means[col]) / column_stds[col]
     return standardized_df
 
-def majority_voting(models: List, not_std_models: List, X: np.ndarray, X_not_std: np.ndarray):
+def majority_voting(std_models: List, models: List, X_std: np.ndarray, X: np.ndarray):
     num_entries = len(X)
     predictions = []
     # Preallocate an array for predictions
-    all_preds = np.zeros((num_entries, len(models)+len(not_std_models)))
+    all_preds = np.zeros((num_entries, len(models)+len(std_models)))
 
-    for i in range(len(models)):
-        all_preds[:, i] = models[i].predict(X)
-    for j in range(len(models), len(models) + len(not_std_models)):
-        all_preds[:, j] = not_std_models[j-len(models)].predict(X_not_std)
+    for i in range(len(std_models)):
+        all_preds[:, i] = std_models[i].predict(X_std)
 
+    for j in range(len(std_models), len(std_models) + len(models)):
+        all_preds[:, j] = std_models[j-len(models)].predict(X)
 
     for i in range(num_entries):
         counter = Counter(all_preds[i])
@@ -62,33 +61,52 @@ def outputFormatter(pred, acc, f1, filename):
 if __name__ == "__main__":
 
     # ----------------- Validating the algorithms on completely unseen data --------------
-    validationset = INFS4203Dataset("val_strat.csv", preprocessing=True)
-    X_val_std = validationset.std_normalized_df.iloc[:, :-1].values
-    X_val = validationset.df.iloc[:, :-1].values
-    y_val = validationset.iloc[:, -1].values
+    trainingset = INFS4203Dataset("train_strat.csv", preprocessing=True)
+    column_means = trainingset.column_means
+    column_stds = trainingset.column_stds
+
+    #This yields the dataframe with imputed NaN values, outliers are not removed.
+    validationdata = INFS4203Dataset("val_strat.csv", preprocessing=True).df
+    X_val = validationdata.iloc[:, :-1].values
+    y_val = validationdata.iloc[:, -1].values
+
+    #Standardize the test data according to the means and std's computed on the training set
+    X_val_std = standardize_test_data(validationdata, column_means, column_stds).iloc[:, :-1].values
 
     #Load the models from best checkpoints
     knn = joblib.load(get_data_dir() / "knn_best.joblib")
+    print(knn.model)
     kmeans = joblib.load(get_data_dir() / "kmeans_best.joblib")
+    print(kmeans.model)
     rf = joblib.load(get_data_dir() / "rf_best.joblib")
+    print(rf.model)
 
     #Score the models on the validation data
     print("KNN score: ", knn.score(X_val_std, y_val))
     print("KMeans score: ", kmeans.score(X_val_std, y_val))
     print("Random Forest score: ", rf.score(X_val, y_val))
-    
 
 
-#Using the random forest algorithm to predict the labels for the test set
-testset = pd.read_csv(get_data_dir() / "test.csv")
-testset_standardized = standardize_test_data(testset, train_data.column_means, train_data.column_stds)
+    #Majority voting test
+    models = [rf, rf]
+    std_models = [knn, kmeans]
 
-testset_not_std = testset.iloc[:, :].values #This is the featurespace used for the RF-algo on the test set
+    pred = majority_voting(std_models, models, X_val_std, X_val)
 
-y_pred = rf.predict(testset_not_std)
+    majority_f1 = f1_score(y_val, pred, average='macro')
+    print("Majority voting F1",  majority_f1)
 
-#Generate report
-acc = rf.model.score(X_val_not_std, y_val)
-f1 = f1_score(y_val, rf.predict(X_val_not_std), average="macro")
 
-outputFormatter(y_pred, acc, f1, get_data_dir() / "s4827064_strat.csv")
+
+
+    #Generating the report - using the random forest algorithm - NOT majority voting
+    acc = rf.model.score(X_val, y_val)
+    f1 = f1_score(y_val, rf.predict(X_val), average="macro")   
+
+    #Using the random forest algorithm to predict the labels for the test set
+    testset = pd.read_csv(get_data_dir() / "test.csv")    
+    testset = testset.iloc[:, :].values #This is the featurespace used for the RF-algo on the test set
+
+    y_pred = rf.predict(testset)
+
+    outputFormatter(y_pred, acc, f1, "s4827064.csv")

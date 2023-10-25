@@ -12,7 +12,7 @@ import joblib
 
 
 # Load the training data
-train_data = INFS4203Dataset("train_strat.csv", preprocessing=True)
+train_data = INFS4203Dataset("train_strat_2.csv", preprocessing=True)
 
 # Optional - plot the tSNE dimensionality reduction for inspecting the dataset
 #train_data.plotTSNE(train_data.cleaned_df)
