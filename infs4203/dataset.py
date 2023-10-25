@@ -81,7 +81,11 @@ class INFS4203Dataset:
         plt.show()
 
     def plot_distribution(self, column_name, df, block):
-        subframes = [df[df["Label"] == i] for i in range(0, 10)]
+        last_column = self.df.iloc[:, -1]
+        unique_labels = last_column.unique()   
+        assert len(unique_labels) == 10 
+        subframes = [self.df[last_column == elem] for elem in unique_labels]
+
         num_cols = 5
         num_rows = len(subframes) // num_cols + (len(subframes) % num_cols > 0)
         fig, axes = plt.subplots(num_rows, num_cols, figsize=(15, 4 * num_rows))
@@ -104,7 +108,11 @@ class INFS4203Dataset:
         plt.show(block=block)
 
     def shapiro_wilk(self):
-        subframes = [self.df[self.df["Label"] == i] for i in range(0, 10)]
+        last_column = self.df.iloc[:, -1]
+        unique_labels = last_column.unique()   
+        assert len(unique_labels) == 10 
+        subframes = [self.df[last_column == elem] for elem in unique_labels]
+
         num_columns = len(self.df.columns) - 1  # Excluding 'Label' column
 
         # Create a figure and axes for 2x5 subplots
@@ -134,7 +142,11 @@ class INFS4203Dataset:
 
     def anomaly_detection(self, n_std_dev=3) -> pd.DataFrame:
         # Segment the dataframe based on unique values in the 'Label' column
-        subframes = [self.df[self.df["Label"] == i] for i in range(0, 10)]
+        last_column = self.df.iloc[:, -1]
+        unique_labels = last_column.unique()   
+        assert len(unique_labels) == 10 
+        subframes = [self.df[last_column == elem] for elem in unique_labels]
+
         cleaned_subframes = []  # List to store subframes after removing outliers
         anomalies_records = []  # List to store details about anomalies
 
