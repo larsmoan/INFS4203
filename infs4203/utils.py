@@ -23,8 +23,3 @@ if __name__ == "__main__":
     print("Repo data directory: ", get_data_dir())
 
 
-def standardize_test_data(test_df, column_means, column_stds):
-    standardized_df = test_df.copy()
-    for col in column_means.keys():
-        standardized_df[col] = (test_df[col] - column_means[col]) / column_stds[col]
-    return standardized_df
