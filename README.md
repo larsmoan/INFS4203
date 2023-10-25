@@ -78,18 +78,18 @@ However from inspecting both of them it seems that the second dataset has a lot 
 This can be seen when reducing the dimensionality of the dataset from 128 -> 2 using tSNE (not part of the curriculum).
 
 
-<figure style="margin-right: 4px;">
+<figure style="margin-right: 10px; display: inline-block;">
    <img src="./data/tSNE_primary.png" alt="Example Image" width="460" height="340">
    <figcaption>tSNE on the original dataset</figcaption>
 </figure>
-  
-<figure style="margin-right: 4px;">
+
+<figure style="margin-right: 10px; display: inline-block;">
    <img src="./data/tSNE_secondary.png" alt="Example Image" width="460" height="340">
    <figcaption>tSNE on the secondary dataset</figcaption>
 </figure>
-  
-<figure>
-   <img src="./data/tSNE_joint.png" alt="Example Image" width="460" height="340">
+
+<figure style="display: inline-block;">
+   <img src="./data/tSNE_joint_dset.png" alt="Example Image" width="460" height="340">
    <figcaption>tSNE on the joint dataset of the original + secondary</figcaption>
 </figure>
 
