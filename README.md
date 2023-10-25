@@ -69,30 +69,30 @@ Each sample consist of a *128-dimensional* feature vector, each having a label f
 | 8            | ship         |
 | 9            | truck        |
 
-### Original datase: train.csv
+### Original dataset: train.csv
 This dataset consists of 2180 entries 
 
 ### Secondary dataset: train2.csv
 This dataset was released from the teaching staff midway in the project and conists of 1880 entries of the same size as the original dataset.
 However from inspecting both of them it seems that the second dataset has a lot more inherent complexity present.
-This can be seen when reducing the dimensionality of the dataset from 128 -> 2 using tSNE (not part of the curriculum.)
+This can be seen when reducing the dimensionality of the dataset from 128 -> 2 using tSNE (not part of the curriculum).
 
-<div style="display: flex; justify-content: space-between;">
-  <figure style="margin-right: 4px;">
-    <img src="./data/tSNE_primary.png" alt="Example Image" width="460" height="340">
-    <figcaption>tSNE on the original dataset</figcaption>
-  </figure>
+
+<figure style="margin-right: 4px;">
+   <img src="./data/tSNE_primary.png" alt="Example Image" width="460" height="340">
+   <figcaption>tSNE on the original dataset</figcaption>
+</figure>
   
-  <figure style="margin-right: 4px;">
-    <img src="./data/tSNE_secondary.png" alt="Example Image" width="460" height="340">
-    <figcaption>tSNE on the secondary dataset</figcaption>
-  </figure>
+<figure style="margin-right: 4px;">
+   <img src="./data/tSNE_secondary.png" alt="Example Image" width="460" height="340">
+   <figcaption>tSNE on the secondary dataset</figcaption>
+</figure>
   
-  <figure>
-    <img src="./data/tSNE_joint.png" alt="Example Image" width="460" height="340">
-    <figcaption>tSNE on the joint dataset of the original + secondary</figcaption>
-  </figure>
-</div>
+<figure>
+   <img src="./data/tSNE_joint.png" alt="Example Image" width="460" height="340">
+   <figcaption>tSNE on the joint dataset of the original + secondary</figcaption>
+</figure>
+
 
 Another finding when comparing the datasets is how closely each class specific feature follows a gaussian distribution.
 
