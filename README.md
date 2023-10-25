@@ -171,4 +171,4 @@ Decision tree performed so poorly that I haven't included it in the results.
 
 
 
-### During the project process I did numerous different train / val splits and RandomForest seemed to generally always perform better on completely unseen data. Especially when it was fitted on the original dataset (train.csv) and validated on the second dataset (train2.csv). Therefore RandomForest was chosen as the classifier used on the testset and generated the results for the final report.
+***During the project process I did numerous different train / val splits and RandomForest seemed to generally always perform better on completely unseen data. Especially when it was fitted on the original dataset (train.csv) and validated on the second dataset (train2.csv). Therefore RandomForest was chosen as the classifier used on the testset and generated the results for the final report.***
