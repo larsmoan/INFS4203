@@ -1,5 +1,5 @@
 from collections import Counter
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 from sklearn.cluster import KMeans
 from sklearn.ensemble import RandomForestClassifier as SklearnRandomForestClassifier
 from sklearn.metrics import classification_report, f1_score
