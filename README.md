@@ -62,9 +62,10 @@ Another interesting finding was how tSNE was able to reduce the dimensionality r
 
 
 # Model results
-From the initial training I tested out k-NN, k-means, decision tree and random forest. Quite quickly it seemed that using grid search cross-validation I was able to get an f1-macro of 1 using all models except for the Decision Tree.
+From the initial training I tested out k-NN, k-means, decision tree and random forest.
+Decision tree performed so poorly that I haven't included it in the results.
 
-The results was obtained using the other training set: train2.csv as a completely unseen testset, but with labels.
+### The results was obtained using the other training set: train2.csv as a completely unseen testset, but with labels.
 
 ## Classification reports:
 RandomForest classifier 

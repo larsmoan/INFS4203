@@ -10,9 +10,7 @@ from models import (
     KNNClassifier,
     RandomForestCLassifier,
 )
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import f1_score
-from sklearn.tree import DecisionTreeClassifier, plot_tree
 from utils import get_data_dir
 import os
 
@@ -21,7 +19,6 @@ def standardize_test_data(test_df, column_means, column_stds):
     for col in column_means.keys():
         standardized_df[col] = (test_df[col] - column_means[col]) / column_stds[col]
     return standardized_df
-
 
 def majority_voting(models: List, not_std_models: List, X: np.ndarray, X_not_std: np.ndarray):
     num_entries = len(X)
@@ -58,11 +55,9 @@ def outputFormatter(pred, acc, f1, filename):
     pred_int = [int(x) for x in pred]
     csv_string = ",\n".join(map(str, pred_int))
     csv_string += ",\n" + acc + "," + f1
-    #filename = filename if filename.endswith(".csv") else filename + ".csv"
     with open(filename, "w") as f:
         f.write(csv_string)
     return csv_string
-
 
 if __name__ == "__main__":
     # ---------- Load the dataset --------------------
@@ -110,13 +105,12 @@ if __name__ == "__main__":
     else:
         #We dont have a "fitted" random forest yet
         rf = RandomForestCLassifier()
-
         rf.fit(X_not_std, y, hyperparams_rf)  #Not using standardized data for X since this is not needed for RF
         joblib.dump(rf, get_data_dir() / "rf_best_estimator.joblib")    #Saving the optimized rf
 
 
     
-    # ----------------- Testing the algorithms on completely unseen data --------------
+    # ----------------- Validating the algorithms on completely unseen data --------------
     validationset = INFS4203Dataset(
         "train2.csv", preprocessing=True
     ).df  # This will utilize the same class by imputing the NaN's present in the other train set
@@ -143,7 +137,7 @@ if __name__ == "__main__":
     y_pred = rf.predict(testset_not_std)
     
     #Generate report
-    acc = rf.model.score(X_val_not_std, y_val)
+    """ acc = rf.model.score(X_val_not_std, y_val)
     f1 = f1_score(y_val, rf.predict(X_val_not_std), average="macro")
 
-    outputFormatter(y_pred, acc, f1, get_data_dir() / "s4827064.csv")
+    outputFormatter(y_pred, acc, f1, get_data_dir() / "s4827064.csv") """
