@@ -5,11 +5,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from dataset import INFS4203Dataset
-from models import (
-    KMeansClassifier,
-    KNNClassifier,
-    RandomForestCLassifier,
-)
 from sklearn.metrics import f1_score
 from utils import get_data_dir
 
@@ -108,5 +103,4 @@ if __name__ == "__main__":
     testset = testset.iloc[:, :].values #This is the featurespace used for the RF-algo on the test set
 
     y_pred = rf.predict(testset)
-
     outputFormatter(y_pred, acc, f1, "s4827064.csv")
