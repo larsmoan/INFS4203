@@ -7,6 +7,7 @@ import pandas as pd
 from dataset import INFS4203Dataset
 from sklearn.metrics import f1_score
 from utils import get_data_dir
+from sklearn.model_selection import cross_val_score
 
 def standardize_test_data(test_df, column_means, column_stds):
     standardized_df = test_df.copy()
@@ -68,7 +69,7 @@ if __name__ == "__main__":
     #Standardize the test data according to the means and std's computed on the training set
     X_val_std = standardize_test_data(validationdata, column_means, column_stds).iloc[:, :-1].values
 
-    #Load the models from best checkpoints
+    #Load the models from best checkpoints - will print the best hyperparameters provided from the search
     knn = joblib.load(get_data_dir() / "knn_best.joblib")
     print(knn.model)
     kmeans = joblib.load(get_data_dir() / "kmeans_best.joblib")
@@ -81,22 +82,16 @@ if __name__ == "__main__":
     print("KMeans score: ", kmeans.score(X_val_std, y_val))
     print("Random Forest score: ", rf.score(X_val, y_val))
 
-
     #Majority voting test
     models = [rf, rf]
     std_models = [knn, kmeans]
-
     pred = majority_voting(std_models, models, X_val_std, X_val)
-
     majority_f1 = f1_score(y_val, pred, average='macro')
     print("Majority voting F1",  majority_f1)
 
 
-
-
     #Generating the report - using the random forest algorithm - NOT majority voting
-    acc = rf.model.score(X_val, y_val)
-    f1 = f1_score(y_val, rf.predict(X_val), average="macro")   
+    f1, acc = rf.score(X_val, y_val)
 
     #Using the random forest algorithm to predict the labels for the test set
     testset = pd.read_csv(get_data_dir() / "test.csv")    

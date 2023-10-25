@@ -1,12 +1,13 @@
 from collections import Counter
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Tuple
 from sklearn.cluster import KMeans
 from sklearn.ensemble import RandomForestClassifier as SklearnRandomForestClassifier
 from sklearn.metrics import classification_report, f1_score
 from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import KNeighborsClassifier
-from tqdm import tqdm
-
+from sklearn.metrics import make_scorer, f1_score
+from sklearn.model_selection import cross_val_score
+import numpy as np
 
 class KNNClassifier:
     def __init__(self):
@@ -29,13 +30,18 @@ class KNNClassifier:
     def predict(self, X):   #Ugly, but needed for majority voting
         return self.model.predict(X)
 
-    def score(self, X, y):
+    def score(self, X, y) -> tuple:
         predicted_labels = self.predict(X)
         report = classification_report(y, predicted_labels)
         print("Classification report for: KNN classifier \n", report)
-        f1 = f1_score(y, predicted_labels, average="macro")
-        print("F1: ", f1)
-        return f1
+        
+        f1_macro_scorer = make_scorer(f1_score, average='macro')
+        f1_cv_scores = cross_val_score(self.model, X, y, cv=10, scoring=f1_macro_scorer)
+        acc_cv_scores = cross_val_score(self.model, X, y, cv=10, scoring='accuracy')
+
+        print("F1 avg 10cv score: ", np.mean(f1_cv_scores))
+        print("Acc avg 10cv score:", np.mean(acc_cv_scores))
+        return (np.mean(f1_cv_scores), np.mean(acc_cv_scores))
 
 class KMeansClassifier:
     def __init__(self):
@@ -65,19 +71,24 @@ class KMeansClassifier:
             most_common_label = Counter(true_labels_in_cluster).most_common(1)[0][0]
             self.cluster_to_label_mapping[cluster_id] = most_common_label
 
-    
-
     def predict(self, X):
         clusters = self.model.predict(X)
         return [self.cluster_to_label_mapping[cluster] for cluster in clusters]
 
-    def score(self, X, y):
+    def score(self, X, y) -> tuple:
         predicted_labels = self.predict(X)
         report = classification_report(y, predicted_labels)
         print("Classification report for: KMeans classifier \n", report)
-        f1 = f1_score(y, predicted_labels, average="macro")
-        print("F1: ", f1)
-        return f1
+        
+
+        f1_macro_scorer = make_scorer(f1_score, average='macro')
+        f1_cv_scores = cross_val_score(self.model, X, y, cv=10, scoring=f1_macro_scorer)
+        acc_cv_scores = cross_val_score(self.model, X, y, cv=10, scoring='accuracy')
+
+
+        print("F1 avg 10cv score: ", np.mean(f1_cv_scores))
+        print("Acc avg 10cv score:", np.mean(acc_cv_scores))
+        return (np.mean(f1_cv_scores), np.mean(acc_cv_scores))
 
 class RandomForestCLassifier:
     def __init__(self):
@@ -102,13 +113,20 @@ class RandomForestCLassifier:
         print("RF best score: ", grid_search.best_score_)
 
     
-    def score(self, X, y):
+    def score(self, X, y) -> tuple:
         predicted_labels = self.predict(X)
         report = classification_report(y, predicted_labels)
         print("Classification report for: RandomForest classifier \n", report)
-        f1 = f1_score(y, predicted_labels, average="macro")
-        print("F1: ", f1)
-        return f1
+        
+
+        f1_macro_scorer = make_scorer(f1_score, average='macro')
+        f1_cv_scores = cross_val_score(self.model, X, y, cv=10, scoring=f1_macro_scorer)
+        acc_cv_scores = cross_val_score(self.model, X, y, cv=10, scoring='accuracy')
+
+
+        print("F1 avg 10cv score: ", np.mean(f1_cv_scores))
+        print("Acc avg 10cv score:", np.mean(acc_cv_scores))
+        return (np.mean(f1_cv_scores), np.mean(acc_cv_scores))
 
     def predict(self, X):
         return self.model.predict(X)

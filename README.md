@@ -112,8 +112,6 @@ This can be seen when reducing the dimensionality of the dataset from 128 -> 2 u
 </figure>
 
 
-
-
 # Model results
 From the initial training I tested out k-NN, k-means, decision tree and random forest.
 Decision tree performed so poorly that I haven't included it in the results.
